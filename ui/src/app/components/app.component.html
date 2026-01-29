@@ -7,13 +7,19 @@
         </a>
         <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
           <li class="nav-item" *ngFor="let link of links">
-            <a href="#" class="nav-link py-3 px-2" href="#{{link.name}}" style="color:{{link.color}}!important;" (click)="navigate(link.name)" title="{{link.name}}">
+            <a class="nav-link py-3 px-2" href="#{{link.name}}" style="color:{{link.color}}!important;" (click)="navigate(link.name)" title="{{link.name}}">
               @if (link.active) {
                 <i class="bi-{{link.iconActive}} fs-1"></i>
               }
               @else {
                 <i class="bi-{{link.iconInactive}} fs-2"></i>
               }
+            </a>
+          </li>
+          <hr>
+          <li class="nav-item">
+            <a class="nav-link py-3 px-2" href="https://github.com/hydrogen2oxygen/impara-tutor" target="github" style="color:#dddddd!important;" title="GITHUB">
+                <i class="bi bi-github fs-1"></i>
             </a>
           </li>
         </ul>

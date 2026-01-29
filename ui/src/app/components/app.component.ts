@@ -21,6 +21,8 @@ export class AppComponent implements OnInit, OnDestroy  {
 
   ngOnInit(): void {
     this.initLinks()
+
+
   }
 
   navigate(navigationPath: string) {
@@ -30,9 +32,13 @@ export class AppComponent implements OnInit, OnDestroy  {
 
   private activateCurrentLink(navigationPath?: string) {
 
+    console.log("activateCurrentLink: " + navigationPath);
+
     if (navigationPath?.length === 0) {
       navigationPath = 'HOME';
     }
+
+    navigationPath = navigationPath?.replace("#","")
 
     this.links.forEach(link => {
       if (link.name === navigationPath) {
@@ -47,8 +53,17 @@ export class AppComponent implements OnInit, OnDestroy  {
 
   private initLinks() {
     this.addLink("HOME", "house-fill","house", true, "#37c9fb", "#738893");
+    this.addLink("READ", "book-half","book", true, "#41ff0f", "#4e7344");
     this.addLink("STATISTICS",  "speedometer2","speedometer2",false, "#fd2a2a", "#a57777");
-    this.activateCurrentLink("HOME");
+
+    let href = document.location.href;
+    if (href.indexOf("#") > 0) {
+      let parts = href.split("/");
+      let navigationPath = parts[parts.length -1].toUpperCase();
+      this.activateCurrentLink(navigationPath);
+    } else {
+      this.activateCurrentLink("HOME");
+    }
   }
 
   private addLink(name: string, iconActive:string, iconInactive:string, active: boolean, activeColor:string, inactiveColor: string) {
