@@ -16,7 +16,8 @@ import {NgIf} from "@angular/common";
 export class ReadComponent implements OnInit {
   importText = new FormControl('', { nonNullable: true })
   text = new FormControl('', { nonNullable: true })
-  responseText = ""
+  mostImportantWord = ""
+  simplifiedText = ""
   loading: boolean = false;
 
   constructor(private ollama:OllamaService ) {}
@@ -38,14 +39,26 @@ export class ReadComponent implements OnInit {
     this.text.setValue(this.importText.value);
   }
 
-  testOllama() {
+  mostImportantWords() {
     this.loading = true;
 
     let question = `Take from this text the most important words and return it as a comma-separated list (only the most important words and avoid comments and other stuff): \n\n${this.text.value}`;
 
     this.ollama.chat(question).subscribe(response => {
       console.log("Ollama response: ", response);
-      this.responseText = response;
+      this.mostImportantWord = response;
+      this.loading = false;
+    });
+  }
+
+  generateSimplerText() {
+    this.loading = true;
+
+    let question = `Simplify this text: \n\n${this.text.value}`;
+
+    this.ollama.chat(question).subscribe(response => {
+      console.log("Ollama response: ", response);
+      this.simplifiedText = response;
       this.loading = false;
     });
   }

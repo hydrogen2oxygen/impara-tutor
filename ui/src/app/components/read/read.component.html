@@ -1,15 +1,19 @@
 <h3>Read</h3>
 <hr>
 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSourceModal">Add a New Source</button>
-<button style="margin-left: 0.3rem" class="btn btn-success" (click)="testOllama()">TEST</button>
+<button style="margin-left: 0.3rem" class="btn btn-success" (click)="mostImportantWords()">Most important words</button>
+<button style="margin-left: 0.3rem" class="btn btn-success" (click)="generateSimplerText()">Simplify</button>
 <hr>
 <div>
   {{text.value}}
 </div>
 <span *ngIf="loading">Loading...</span>
 <hr>
-<div>
-  {{responseText}}
+<div style="margin: 0.5rem; background: #c7cbd5">
+  {{mostImportantWord}}
+</div>
+<div style="margin: 0.5rem; background: #abb0ba">
+  {{simplifiedText}}
 </div>
 <hr>
 <div class="alert alert-dark" role="alert">
