@@ -1,7 +1,9 @@
 export class Link {
   name:string = "";
-  icon:string = "";
+  iconActive:string = "";
+  iconInactive:string = "";
   active:boolean=false;
-  backgroundColor:string="#ff0000";
-  color:string="#ffffff"
+  activeColor:string="#ffffff"
+  inactiveColor:string="#ff0000";
+  color:string="#ffffff";
 }

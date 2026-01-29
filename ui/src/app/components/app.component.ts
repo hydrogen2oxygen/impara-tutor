@@ -35,26 +35,30 @@ export class AppComponent implements OnInit, OnDestroy  {
     }
 
     this.links.forEach(link => {
-      link.active = false;
-
       if (link.name === navigationPath) {
         link.active = true;
+        link.color = link.activeColor;
+      } else {
+        link.active = false;
+        link.color = link.inactiveColor;
       }
     });
   }
 
   private initLinks() {
-    this.addLink("HOME", "house", true, "#0c7e05", "#0bb5ff");
-    this.addLink("STATISTICS",  "speedometer2",false, "#ff9520", "#f87a7a");
+    this.addLink("HOME", "house-fill","house", true, "#37c9fb", "#738893");
+    this.addLink("STATISTICS",  "speedometer2","speedometer2",false, "#fd2a2a", "#a57777");
+    this.activateCurrentLink("HOME");
   }
 
-  private addLink(name: string, icon:string, active: boolean, backgroundColor:string, color: string) {
+  private addLink(name: string, iconActive:string, iconInactive:string, active: boolean, activeColor:string, inactiveColor: string) {
     let link:Link = new Link();
     link.name = name;
-    link.icon = icon;
+    link.iconActive = iconActive;
+    link.iconInactive = iconInactive;
     link.active = active;
-    link.backgroundColor = backgroundColor;
-    link.color = color;
+    link.activeColor = activeColor;
+    link.inactiveColor = inactiveColor;
     this.links.push(link)
   }
 
