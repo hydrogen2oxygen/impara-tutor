@@ -1,7 +1,16 @@
 <h3>Read</h3>
 <hr>
 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSourceModal">Add a New Source</button>
-
+<button style="margin-left: 0.3rem" class="btn btn-success" (click)="testOllama()">TEST</button>
+<hr>
+<div>
+  {{text.value}}
+</div>
+<span *ngIf="loading">Loading...</span>
+<hr>
+<div>
+  {{responseText}}
+</div>
 <hr>
 <div class="alert alert-dark" role="alert">
   Reading feeds your mind with living patterns of the language—how words naturally combine, how meaning flows, and how grammar works without forcing rules. Each sentence quietly trains intuition, so vocabulary and structure settle into you almost unconsciously.
@@ -18,11 +27,11 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        ... your text here ...
+        <textarea [formControl]="importText" class="form-control text-area" rows="10" placeholder="Paste your text source here..."></textarea>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-primary" (click)="saveText()" ) data-bs-toggle="modal" data-bs-target="#addSourceModal">Save changes</button>
       </div>
     </div>
   </div>
