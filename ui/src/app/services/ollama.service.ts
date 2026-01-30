@@ -17,15 +17,20 @@ export class OllamaService {
 
   constructor(private http: HttpClient) {}
 
-  chat(question: string): Observable<string> {
+  chat(question: string, system: string): Observable<string> {
     console.log(question)
+
     const body = {
       model: this.baseModel,
       stream: false,
       messages: [
         {
+          role: "system",
+          content: system
+        },
+        {
           role: 'user',
-          content:`${question}`
+          content: question
         }
       ]
     };
