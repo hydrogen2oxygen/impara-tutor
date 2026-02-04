@@ -1,4 +1,4 @@
 {
   "port": 7000,
-  "OpenAI_API_Key": "your-api-key-here"
+  "OpenAI_API_Key": "your-api-key-here ... you get it from https://platform.openai.com/"
 }

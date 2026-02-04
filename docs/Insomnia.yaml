@@ -1,0 +1,57 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: Impara-Tutor
+meta:
+  id: wrk_adbee80362e5489297728f9e44c720f0
+  created: 1769874270429
+  modified: 1769874270429
+  description: ""
+collection:
+  - url: "{{ _.baseUrl }}/translate"
+    name: translate
+    meta:
+      id: req_fc9102b3ecd0404da877bae10bfa7863
+      created: 1769874381489
+      modified: 1769874602743
+      isPrivate: false
+      description: ""
+      sortKey: -1769874381489
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"text":"Come stai?",
+        	"from":"it",
+        	"to":"de"
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/12.3.0
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_8501483f9a531abb98909e15ca29cf70d084becf
+    created: 1769874270431
+    modified: 1769874270431
+environments:
+  name: Base Environment
+  meta:
+    id: env_8501483f9a531abb98909e15ca29cf70d084becf
+    created: 1769874270430
+    modified: 1769874449696
+    isPrivate: false
+  data:
+    baseUrl: http://localhost:7000/api

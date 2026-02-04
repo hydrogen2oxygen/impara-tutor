@@ -2,6 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {OllamaService} from "../../services/ollama.service";
 import {FormControl, ReactiveFormsModule} from "@angular/forms";
 import {NgForOf, NgIf} from "@angular/common";
+import {OpenAiService} from "../../services/open-ai.service";
+import {parseJson} from "@angular/cli/src/utilities/json-file";
 
 @Component({
   selector: 'app-read',
@@ -22,7 +24,8 @@ export class ReadComponent implements OnInit {
   loading: boolean = false;
   tokensDifficulty: any[] = []
 
-  constructor(private ollama:OllamaService ) {}
+  constructor(private ollama:OllamaService,
+              private openAi:OpenAiService) {}
 
   ngOnInit(): void {
     this.importText.setValue("Утром я готовлю завтрак.\n" +
@@ -46,11 +49,19 @@ export class ReadComponent implements OnInit {
 
     let question = `Take from this text the most important words and return it as a comma-separated list (only the most important words and avoid comments and other stuff): \n\n${this.text.value}`;
 
-    this.ollama.chat(question,'').subscribe(response => {
+    this.openAi.chat('gpt-4o-mini', question, '').subscribe(response => {
+      console.log("OpenAI response: ", response);
+
+      console.log(response)
+      this.mostImportantWord = response.message;
+      this.loading = false;
+    });
+
+    /*this.ollama.chat(question,'').subscribe(response => {
       console.log("Ollama response: ", response);
       this.mostImportantWord = response;
       this.loading = false;
-    });
+    });*/
   }
 
   generateSimplerText() {
@@ -58,11 +69,19 @@ export class ReadComponent implements OnInit {
 
     let question = `Simplify this text: \n\n${this.text.value}`;
 
-    this.ollama.chat(question,'You are very good in simplifying text in its own language').subscribe(response => {
+    this.openAi.chat('gpt-4o-mini', question, 'You are very good in simplifying text in its own language').subscribe(response => {
+      console.log("OpenAI response: ", response);
+
+      console.log(response)
+      this.simplifiedText = response.message;
+      this.loading = false;
+    });
+
+    /*this.ollama.chat(question,'You are very good in simplifying text in its own language').subscribe(response => {
       console.log("Ollama response: ", response);
       this.simplifiedText = response;
       this.loading = false;
-    });
+    });*/
   }
 
   evaluateDifficulty() {
@@ -78,16 +97,29 @@ Rules:
 - translationEN is only for type=word, else empty string. Always translate to English.
 Text: \n\n${this.text.value}`;
 
-    this.ollama.chat(question,'You are a JSON API. Output MUST be valid JSON only. No markdown, no code fences, no explanations.').subscribe(response => {
+    this.openAi.chat('gpt-4o-mini', question, 'You are a JSON API. Output MUST be valid JSON only. No markdown, no code fences, no explanations.').subscribe(response => {
+      console.log("OpenAI response: ", response);
+
+      console.log(response)
+      this.tokensDifficulty = this.extractJsonFromModelOutput(response.message);
+      this.loading = false;
+    });
+
+    /*this.ollama.chat(question,'You are a JSON API. Output MUST be valid JSON only. No markdown, no code fences, no explanations.').subscribe(response => {
       console.log("Ollama response: ", response);
 
       this.tokensDifficulty = this.extractJsonFromModelOutput(response);
       this.loading = false;
-    });
+    });*/
   }
 
   extractJsonFromModelOutput(raw: string): any {
+    console.log("Inside extractJsonFromModelOutput")
     if (!raw) throw new Error('Empty model response');
+
+    try {
+      return JSON.parse(raw);
+    } catch { /* keep trying */ }
 
     // Remove common wrappers that break parsing
     const cleaned = raw

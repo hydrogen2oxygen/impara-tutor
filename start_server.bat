@@ -11,7 +11,7 @@ if exist node_modules (
 )
 
 echo Building Angular app...
-npx ng build
+call npx ng build
 
 if %ERRORLEVEL% NEQ 0 (
     echo Angular build failed
