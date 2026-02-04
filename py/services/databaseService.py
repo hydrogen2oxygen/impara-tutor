@@ -4,14 +4,16 @@ from typing import List
 from datetime import datetime
 import json
 
-from flask import jsonify
-
 from py.domains.ImparaDomains import User
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 
-class ImparaDAO:
+class ImparaDB:
     def __init__(self, db_filename):
+        # Ensure the directory exists before connecting to the database
+        db_dir = os.path.dirname(db_filename)
+        os.makedirs(db_dir, exist_ok=True)
+
         self.conn = sqlite3.connect(db_filename, isolation_level=None, timeout=10, check_same_thread=False)
         self.conn.execute('PRAGMA journal_mode = WAL;')
         self.conn.execute('PRAGMA foreign_keys = ON;')
@@ -22,7 +24,7 @@ class ImparaDAO:
 
     def create_table(self):
         user_query = '''
-            CREATE TABLE user
+            CREATE TABLE IF NOT EXISTS user
             (
                 id             INTEGER PRIMARY KEY AUTOINCREMENT,
                 display_name   TEXT NOT NULL,
@@ -75,7 +77,7 @@ class ImparaDAO:
             users.append(user)
         return users
 
-    def sqlSelect(self, sql:str):
+    def sql_select(self, sql:str):
         cursor = self.conn.execute(sql)
         # Get column names from cursor description
         column_names = [desc[0] for desc in cursor.description]
@@ -104,7 +106,7 @@ class ImparaDAO:
         if key not in dictionary:
             dictionary[key] = default_value
 
-    def loadSettings(self) -> json:
+    def load_settings(self) -> json:
         json_file_path = os.path.join(PROJECT_ROOT, "data", "settings.json")
         if os.path.isfile(json_file_path):
             with open(json_file_path, 'r') as f:
@@ -115,10 +117,10 @@ class ImparaDAO:
             with open(json_file_path, 'w') as f:
                 settings = {'created': datetime.now().isoformat()}
                 self.ensure_settings_defaults(settings)
-                json.dump(settings, f)
-            return jsonify(settings)
+                json.dump(settings, f, indent=4)
+            return settings
 
-    def saveSettings(self, settings):
+    def save_settings(self, settings):
         json_file_path = os.path.join(PROJECT_ROOT, "data", "settings.json")
         self.ensure_settings_defaults(settings)
         with open(json_file_path, 'w') as f:
@@ -126,13 +128,10 @@ class ImparaDAO:
 
     def get_setting(self, key:str):
         try:
-            return self.loadSettings()[key]
+            return self.load_settings()[key]
         except:
             return None
 
     def __del__(self):
         self.conn.close()
 
-# DAO Service to be imported into another class
-def get_case_dao(db_filename: str) -> ImparaDAO:
-    return ImparaDAO(db_filename)
