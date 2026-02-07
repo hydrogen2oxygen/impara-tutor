@@ -1,2 +1,56 @@
 <h1>Impara-Tutor</h1>
-<p>Your personal language learning assistent, AI driven, backed up by pure logic!</p>
+<p>Your personal language learning assistent, maybe even AI driven, but backed up by pure logic!</p>
+@if (!user) {
+    <p>To get started, please <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#loginModal">login</button>
+      or <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#registerModal">register</button>.</p>
+  <p>Registration is only necessary to distinguish between multiple users. Your data remains private on this local installation.</p>
+} @else {
+  <p>Welcome back, <b>{{ user.display_name }}!</b> You can start a new learning session or review your past sessions.</p>
+    <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+        <button class="btn btn-primary me-md-2" routerLink="/new-session">Start New Session</button>
+        <button class="btn btn-secondary" routerLink="/sessions">Review Past Sessions</button>
+    </div>
+}
+
+<!-- Modals -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="loginModalLabel">Login</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="registerModalLabel">Register</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <p>As you can see, no password is required.</p>
+          <div class="mb-3">
+            <label for="displayName" class="form-label">Display Name (Avatar)</label>
+            <input type="text" class="form-control" id="displayName" placeholder="Display name" [formControl]="display_name" >
+          </div>
+          <div class="mb-3">
+            <label for="registerEmail" class="form-label">Email address</label>
+            <input type="email" class="form-control" id="registerEmail" placeholder="Enter your email" [formControl]="email">
+          </div>
+          <div class="mb-3">
+            <label for="bio" class="form-label">Bio - in one line telling others who you are</label>
+            <input type="text" class="form-control" id="bio" placeholder="Tell something about you" [formControl]="bio" >
+          </div>
+          <p>Later you will be able to choose an avatar icon.</p>
+          <button class="btn btn-primary" (click)="register()" data-bs-toggle="modal" data-bs-target="#registerModal">Register</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -7,3 +7,4 @@ requests
 pyttsx3
 gtts
 pygame
+email-validator

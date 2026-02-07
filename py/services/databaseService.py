@@ -4,7 +4,7 @@ from typing import List
 from datetime import datetime
 import json
 
-from py.domains.ImparaDomains import User
+from py.domains.ImparaDomains import User, UserCreate
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 
@@ -33,13 +33,13 @@ class ImparaDB:
                 avatar_path    TEXT,
 
                 created_at     TEXT NOT NULL DEFAULT (datetime('now')),
-                last_active_at TEXT
+                last_active_at TEXT NOT NULL DEFAULT (datetime('now'))
             );
         '''
         self.conn.execute(user_query)
         self.conn.commit()
 
-    def insert_user(self, user: User):
+    def insert_user(self, user: UserCreate):
         query = '''
         INSERT INTO user (display_name, email, bio, avatar_path, created_at, last_active_at)
         VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))
@@ -56,11 +56,17 @@ class ImparaDB:
         return None
 
     def get_user_by_name(self, name: str) -> User | None:
-        row = self.conn.execute('SELECT * FROM user WHERE name = ?', (name,)).fetchone()
+        row = self.conn.execute('SELECT * FROM user WHERE display_name = ?', (name,)).fetchone()
         if row:
-            user = User(row[1], row[2], row[3], row[4], row[5], row[6], row[7])
-            user.id = row[0]
-            return user
+            return User(
+                id=row[0],
+                display_name=row[1],
+                email=row[2],
+                bio=row[3],
+                avatar_path=row[4],
+                created_at=row[5],
+                last_active_at=row[6],
+            )
         return None
 
     def delete_user(self, user_id: int):

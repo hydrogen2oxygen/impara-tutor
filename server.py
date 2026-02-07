@@ -3,6 +3,7 @@ from pathlib import Path
 
 from openai import OpenAI
 
+from py.domains.ImparaDomains import User, UserCreate
 from py.domains.OpenAIRequest import OpenAIRequest
 from py.services.databaseService import ImparaDB
 
@@ -199,6 +200,14 @@ class AngularUIServer:
             try:
                 result = self.translate(text, to_lang=to_lang, from_lang=from_lang)
                 return result
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.post("/api/user")
+        def create_user(user: UserCreate):
+            try:
+                self.db.insert_user(user)
+                return self.db.get_user_by_name(user.display_name)
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 

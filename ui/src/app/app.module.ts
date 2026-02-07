@@ -8,6 +8,7 @@ import {HashLocationStrategy, LocationStrategy} from "@angular/common";
 import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import {LoadingInterceptor} from "./services/loadingInterceptor";
 import { StatisticsComponent } from './components/statistics/statistics.component';
+import {ReactiveFormsModule} from "@angular/forms";
 
 @NgModule({
   declarations: [
@@ -15,11 +16,12 @@ import { StatisticsComponent } from './components/statistics/statistics.componen
     DashboardComponent,
     StatisticsComponent
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        HttpClientModule,
+        ReactiveFormsModule
+    ],
   providers: [
     {provide: LocationStrategy, useClass: HashLocationStrategy},
     {provide: HTTP_INTERCEPTORS,useClass: LoadingInterceptor,multi: true}

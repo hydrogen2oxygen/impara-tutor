@@ -40,6 +40,41 @@ collection:
         send: true
         store: true
       rebuildPath: true
+  - url: "{{ _.baseUrl }}/user"
+    name: user_create
+    meta:
+      id: req_ebce52a32c5245de8cf3a65a719d1cc8
+      created: 1770479602203
+      modified: 1770480887233
+      isPrivate: false
+      description: ""
+      sortKey: -1758859664013.5
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"display_name":"Lu5",
+        	"email":"email@test.de",
+        	"bio":"brave",
+        	"created_at": "2026-02-07T16:05:00+01:00",
+          "last_active_at": "2026-02-07T16:05:00+01:00"
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/12.3.0
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
 cookieJar:
   name: Default Jar
   meta:
