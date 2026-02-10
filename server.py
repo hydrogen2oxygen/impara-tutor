@@ -72,23 +72,6 @@ class AngularUIServer:
         return ""
 
     def _add_routes(self):
-        @self.app.get("/")
-        def read_root():
-            index_path = self.dist_folder / "index.html"
-            if index_path.exists():
-                return FileResponse(index_path)
-            return {"error": "Index file not found. Please build the Angular app first."}
-
-        @self.app.get("/{full_path:path}")
-        def read_static(full_path: str):
-            file_path = self.dist_folder / full_path
-            if file_path.exists() and file_path.is_file():
-                return FileResponse(file_path)
-            index_path = self.dist_folder / "index.html"
-            if index_path.exists():
-                return FileResponse(index_path)
-            return {"error": "Index file not found. Please build the Angular app first."}
-
         @self.app.get('/openAiModels')
         def openAiModels():
             openAiKey = self.settings.get("OpenAI_API_Key")
@@ -210,6 +193,67 @@ class AngularUIServer:
                 return self.db.get_user_by_name(user.display_name)
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.put("/api/user")
+        def update_user(user: User):
+            try:
+                self.db.delete_user(user.id)
+                updated_user = UserCreate(
+                    display_name=user.display_name,
+                    email=user.email,
+                    bio=user.bio,
+                    avatar_path=user.avatar_path
+                )
+                self.db.insert_user(updated_user)
+                return self.db.get_user_by_name(user.display_name)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.get("/api/user")
+        def list_users():
+            try:
+                users = self.db.list_users()
+                return [
+                    {
+                        "id": u.id,
+                        "display_name": u.display_name,
+                        "email": u.email,
+                        "bio": u.bio,
+                        "avatar_path": u.avatar_path,
+                        "created_at": u.created_at,
+                        "last_active_at": u.last_active_at,
+                    }
+                    for u in users
+            ]
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.delete("/api/user/{user_id}")
+        def delete_user(user_id: int):
+            try:
+                self.db.delete_user(user_id)
+                return {"message": f"User with id {user_id} deleted"}
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.get("/")
+        def read_root():
+            index_path = self.dist_folder / "index.html"
+            if index_path.exists():
+                return FileResponse(index_path)
+            return {"error": "Index file not found. Please build the Angular app first."}
+
+        @self.app.get("/{full_path:path}")
+        def read_static(full_path: str):
+            if full_path.startswith("api/"):
+                raise HTTPException(status_code=404)
+            file_path = self.dist_folder / full_path
+            if file_path.exists() and file_path.is_file():
+                return FileResponse(file_path)
+            index_path = self.dist_folder / "index.html"
+            if index_path.exists():
+                return FileResponse(index_path)
+            return {"error": "Index file not found. Please build the Angular app first."}
 
 
 

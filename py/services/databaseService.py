@@ -48,11 +48,21 @@ class ImparaDB:
         self.conn.commit()
 
     def get_user(self, id: int) -> User | None:
-        row = self.conn.execute('SELECT * FROM user WHERE id = ?', (id,)).fetchone()
+        row = self.conn.execute(
+            'SELECT id, display_name, email, bio, avatar_path, created_at, last_active_at FROM user WHERE id = ?',
+            (id,)
+        ).fetchone()
+
         if row:
-            user = User(row[1], row[2], row[3], row[4], row[5], row[6], row[7])
-            user.id = row[0]
-            return user
+            return User(
+                id=row[0],
+                display_name=row[1],
+                email=row[2],
+                bio=row[3],
+                avatar_path=row[4],
+                created_at=row[5],
+                last_active_at=row[6],
+            )
         return None
 
     def get_user_by_name(self, name: str) -> User | None:
@@ -75,13 +85,22 @@ class ImparaDB:
         self.conn.commit()
 
     def list_users(self) -> List[User]:
-        cursor = self.conn.execute('SELECT * FROM user')
-        users = []
-        for row in cursor:
-            user = User(row[1], row[2], row[3], row[4], row[5], row[6], row[7])
-            user.id = row[0]
-            users.append(user)
-        return users
+        rows = self.conn.execute(
+            "SELECT id, display_name, email, bio, avatar_path, created_at, last_active_at FROM user"
+        ).fetchall()
+
+        return [
+            User(
+                id=r[0],
+                display_name=r[1],
+                email=r[2],
+                bio=r[3],
+                avatar_path=r[4],
+                created_at=r[5],
+                last_active_at=r[6],
+            )
+            for r in rows
+        ]
 
     def sql_select(self, sql:str):
         cursor = self.conn.execute(sql)

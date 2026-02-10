@@ -1,28 +1,24 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Link} from "../domains/Link";
 import {ActivatedRoute, Router} from "@angular/router";
+import {ImparaService} from "../services/impara.service";
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit, OnDestroy  {
+export class AppComponent implements OnInit {
 
   constructor(private router: Router,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              private imparaService: ImparaService) {
   }
 
   links: Link[] = [];
 
-  ngOnDestroy(): void {
-      console.log("Method not implemented.");
-  }
-
   ngOnInit(): void {
     this.initLinks()
-
-
   }
 
   navigate(navigationPath: string) {
@@ -38,7 +34,7 @@ export class AppComponent implements OnInit, OnDestroy  {
       navigationPath = 'HOME';
     }
 
-    navigationPath = navigationPath?.replace("#","")
+    navigationPath = navigationPath?.replace("#", "")
 
     this.links.forEach(link => {
       if (link.name === navigationPath) {
@@ -52,22 +48,22 @@ export class AppComponent implements OnInit, OnDestroy  {
   }
 
   private initLinks() {
-    this.addLink("HOME", "house-fill","house", true, "#37c9fb", "#738893");
-    this.addLink("READ", "book-half","book", true, "#41ff0f", "#4e7344");
-    this.addLink("STATISTICS",  "speedometer2","speedometer2",false, "#fd2a2a", "#a57777");
+    this.addLink("HOME", "house-fill", "house", true, "#37c9fb", "#738893");
+    this.addLink("READ", "book-half", "book", true, "#41ff0f", "#4e7344");
+    this.addLink("STATISTICS", "speedometer2", "speedometer2", false, "#fd2a2a", "#a57777");
 
     let href = document.location.href;
     if (href.indexOf("#") > 0) {
       let parts = href.split("/");
-      let navigationPath = parts[parts.length -1].toUpperCase();
+      let navigationPath = parts[parts.length - 1].toUpperCase();
       this.activateCurrentLink(navigationPath);
     } else {
       this.activateCurrentLink("HOME");
     }
   }
 
-  private addLink(name: string, iconActive:string, iconInactive:string, active: boolean, activeColor:string, inactiveColor: string) {
-    let link:Link = new Link();
+  private addLink(name: string, iconActive: string, iconInactive: string, active: boolean, activeColor: string, inactiveColor: string) {
+    let link: Link = new Link();
     link.name = name;
     link.iconActive = iconActive;
     link.iconInactive = iconInactive;
@@ -78,4 +74,7 @@ export class AppComponent implements OnInit, OnDestroy  {
   }
 
 
+  logout() {
+    this.imparaService.logout()
+  }
 }

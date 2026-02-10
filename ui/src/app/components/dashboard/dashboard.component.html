@@ -4,6 +4,10 @@
     <p>To get started, please <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#loginModal">login</button>
       or <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#registerModal">register</button>.</p>
   <p>Registration is only necessary to distinguish between multiple users. Your data remains private on this local installation.</p>
+  <hr>
+  <h2>User List</h2>
+  <p>Select your user. Note: Impara-Tutor does not use passwords.</p>
+  <button *ngFor="let u of userList" class="btn btn-outline-secondary m-1" (click)="selectUser(u)">{{u.display_name}}</button>
 } @else {
   <p>Welcome back, <b>{{ user.display_name }}!</b> You can start a new learning session or review your past sessions.</p>
     <div class="d-grid gap-2 d-md-flex justify-content-md-start">
