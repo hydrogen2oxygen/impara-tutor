@@ -15,6 +15,7 @@ class ImparaDB:
         os.makedirs(db_dir, exist_ok=True)
 
         self.conn = sqlite3.connect(db_filename, isolation_level=None, timeout=10, check_same_thread=False)
+        self.conn.row_factory = sqlite3.Row
         self.conn.execute('PRAGMA journal_mode = WAL;')
         self.conn.execute('PRAGMA foreign_keys = ON;')
         self.create_table()
@@ -85,22 +86,24 @@ class ImparaDB:
         self.conn.commit()
 
     def list_users(self) -> List[User]:
-        rows = self.conn.execute(
+        cur = self.conn.execute(
             "SELECT id, display_name, email, bio, avatar_path, created_at, last_active_at FROM user"
-        ).fetchall()
+        )
+
+        rows = cur.fetchmany(500)
 
         return [
-            User(
-                id=r[0],
-                display_name=r[1],
-                email=r[2],
-                bio=r[3],
-                avatar_path=r[4],
-                created_at=r[5],
-                last_active_at=r[6],
-            )
-            for r in rows
-        ]
+                {
+                    "id": r["id"],
+                    "display_name": r["display_name"],
+                    "email": r["email"],
+                    "bio": r["bio"],
+                    "avatar_path": r["avatar_path"],
+                    "created_at": r["created_at"],
+                    "last_active_at": r["last_active_at"],
+                }
+                for r in rows
+            ]
 
     def sql_select(self, sql:str):
         cursor = self.conn.execute(sql)

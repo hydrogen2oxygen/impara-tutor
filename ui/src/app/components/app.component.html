@@ -5,6 +5,11 @@
         <a href="/" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
           <span class="fs-5 d-none d-sm-inline"><h3>Impara-Tutor</h3></span>
         </a>
+        @if (user) {
+          <hr>
+          <b>{{user.display_name}}</b>
+          <hr>
+        }
         <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
           <li class="nav-item" *ngFor="let link of links">
             <a class="nav-link py-3 px-2" href="#{{link.name}}" style="color:{{link.color}}!important;" (click)="navigate(link.name)" title="{{link.name}}">

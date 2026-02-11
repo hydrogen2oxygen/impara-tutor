@@ -2,6 +2,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Link} from "../domains/Link";
 import {ActivatedRoute, Router} from "@angular/router";
 import {ImparaService} from "../services/impara.service";
+import {User} from "../domains/User";
 
 @Component({
   selector: 'app-root',
@@ -9,6 +10,8 @@ import {ImparaService} from "../services/impara.service";
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
+
+  user: User | null = null // synchronized with ImparaService.user$
 
   constructor(private router: Router,
               private route: ActivatedRoute,
@@ -19,6 +22,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.initLinks()
+    this.imparaService.user$.subscribe( user => {this.user = user})
   }
 
   navigate(navigationPath: string) {

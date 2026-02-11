@@ -212,19 +212,7 @@ class AngularUIServer:
         @self.app.get("/api/user")
         def list_users():
             try:
-                users = self.db.list_users()
-                return [
-                    {
-                        "id": u.id,
-                        "display_name": u.display_name,
-                        "email": u.email,
-                        "bio": u.bio,
-                        "avatar_path": u.avatar_path,
-                        "created_at": u.created_at,
-                        "last_active_at": u.last_active_at,
-                    }
-                    for u in users
-            ]
+                return self.db.list_users()
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
