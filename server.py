@@ -3,7 +3,7 @@ from pathlib import Path
 
 from openai import OpenAI
 
-from py.domains.ImparaDomains import User, UserCreate
+from py.domains.ImparaDomains import User, UserCreate, LanguageCreate, Language
 from py.domains.OpenAIRequest import OpenAIRequest
 from py.services.databaseService import ImparaDB
 
@@ -221,6 +221,28 @@ class AngularUIServer:
             try:
                 self.db.delete_user(user_id)
                 return {"message": f"User with id {user_id} deleted"}
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.get("/api/languages")
+        def list_languages():
+            try:
+                return self.db.list_languages()
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.post("/api/language")
+        def create_user_language(language: LanguageCreate):
+            try:
+                self.db.insert_language(language)
+                return self.db.list_user_languages(language.user_id)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.get("/api/language/{user_id}")
+        def list_user_languages(user_id: int):
+            try:
+                return self.db.list_user_languages(user_id)
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 

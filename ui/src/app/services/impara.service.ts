@@ -3,6 +3,8 @@ import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {User} from "../domains/User";
 import {BehaviorSubject, Observable} from "rxjs";
+import {Languages} from "../domains/Languages";
+import {Language} from "../domains/Language";
 
 @Injectable({
   providedIn: 'root'
@@ -10,8 +12,10 @@ import {BehaviorSubject, Observable} from "rxjs";
 export class ImparaService {
 
   baseUrl: string = environment.baseUrl
-  private userSubject = new BehaviorSubject<User | null>(null);
-  user$ = this.userSubject.asObservable();
+  private userSubject = new BehaviorSubject<User | null>(null)
+  private languageSubject = new BehaviorSubject<Language | null>(null)
+  user$ = this.userSubject.asObservable()
+  language$ = this.languageSubject.asObservable()
 
   constructor(private http: HttpClient) {}
 
@@ -32,12 +36,34 @@ export class ImparaService {
   }
 
   setUser(user: User | null): void {
-    this.userSubject.next(user);
+    this.userSubject.next(user)
     localStorage.setItem("currentUser", JSON.stringify(user))
   }
 
   logout(): void {
-    localStorage.removeItem('currentUser');
-    this.userSubject.next(null);
+    localStorage.removeItem('currentUser')
+    localStorage.removeItem('currentLanguage')
+    this.userSubject.next(null)
+    this.languageSubject.next(null)
+  }
+
+  listLanguages():Observable<Languages[]> {
+    return this.http.get<Languages[]>(`${this.baseUrl}api/languages`)
+  }
+
+  createUserLanguage(language:Language):Observable<any> {
+    return this.http.post(`${this.baseUrl}api/language`, language)
+  }
+
+  listUserLanguages(user: User | null):Observable<Language[]> {
+    if (!user) {
+      return new Observable<Language[]>()
+    }
+    return this.http.get<Language[]>(`${this.baseUrl}api/language/${user.id}`)
+  }
+
+  setUserLanguage(language:Language):void {
+    this.languageSubject.next(language)
+    localStorage.setItem("currentLanguage", JSON.stringify(language))
   }
 }

@@ -15,3 +15,15 @@ class User(BaseModel):
     avatar_path: Optional[str] = None
     created_at: str
     last_active_at: Optional[str] = None
+
+class LanguageCreate(BaseModel):
+    user_id: int
+    source_language: str
+    target_language: str
+
+class Language(BaseModel):
+    id: int
+    user_id: int
+    source_language: str
+    target_language: str
+    created_at: str

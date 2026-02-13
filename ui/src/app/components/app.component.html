@@ -5,11 +5,15 @@
         <a href="/" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
           <span class="fs-5 d-none d-sm-inline"><h3>Impara-Tutor</h3></span>
         </a>
+        <hr>
         @if (user) {
-          <hr>
-          <b>{{user.display_name}}</b>
-          <hr>
+          <b>{{user.display_name}} @if (userLanguage) {<span class="badge rounded-pill text-bg-primary">{{userLanguage.source_language}} -> {{userLanguage.target_language}}</span>
+            <br>{{ getLanguageName(userLanguage.target_language) }}
+          }</b>
+        } @else {
+          <b>... select user ...</b>
         }
+        <hr>
         <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
           <li class="nav-item" *ngFor="let link of links">
             <a class="nav-link py-3 px-2" href="#{{link.name}}" style="color:{{link.color}}!important;" (click)="navigate(link.name)" title="{{link.name}}">
@@ -27,11 +31,13 @@
                 <i class="bi bi-github fs-1"></i>
             </a>
           </li>
-          <li style="position: fixed; bottom: 2rem" class="nav-item">
-            <a class="nav-link py-3 px-2" (click)="logout()" style="color:#dddddd!important;" title="LOGOUT">
-                <i class="bi bi-box-arrow-right fs-1"></i>
-            </a>
-          </li>
+          @if (user) {
+            <li style="position: fixed; bottom: 2rem" class="nav-item">
+              <a class="nav-link py-3 px-2" (click)="logout()" style="color:#dddddd!important;" title="LOGOUT">
+                  <i class="bi bi-box-arrow-right fs-1"></i>
+              </a>
+            </li>
+          }
         </ul>
         <hr>
       </div>

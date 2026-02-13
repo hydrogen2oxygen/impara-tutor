@@ -1,34 +1,74 @@
 <h1>Impara-Tutor</h1>
 <p>Your personal language learning assistent, maybe even AI driven, but backed up by pure logic!</p>
-@if (!user) {
-    <p>To get started, please <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#registerModal">register</button> or select one of the users below.</p>
-  <p>Registration is only necessary to distinguish between multiple users. Your data remains private on this local installation.</p>
-  <hr>
+@if (user) {
+  <p>Welcome back, <b>{{ user.display_name }}!</b> You can start a new learning session or review your past sessions.</p>
+  <div>
+    Here you will see a tree of your language course, each node a lesson, with a main trunc and side brunches.
+    @if (userLanguages.length == 0) {
+      <p>You need to choose your first language course.</p>
+    }
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#languagesModal">Add a new language</button>
+    <hr>
+    @if (userLanguage) {
+      <div class="alert alert-primary" role="alert">
+        Your current language course is <b><span class="badge rounded-pill text-bg-primary">{{userLanguage.source_language}} -> {{userLanguage.target_language}}</span></b>.
+      </div>
+    }
+    <button *ngFor="let lang of userLanguages"
+            [class.btn-info]="userLanguage?.id != lang.id"
+            [class.btn-primary]="userLanguage?.id == lang.id" style="margin-right: 0.4rem" class="btn"
+            (click)="studyCourse(lang)">Study <b>{{lang.source_language}} → {{lang.target_language}}</b></button>
+    <hr>
+  </div>
+} @else {
   <h2>User List</h2>
   <p>Select your user. Note: Impara-Tutor does not use passwords.</p>
   <button *ngFor="let u of userList" class="btn btn-outline-secondary m-1" (click)="selectUser(u)">{{u.display_name}}</button>
-} @else {
-  <p>Welcome back, <b>{{ user.display_name }}!</b> You can start a new learning session or review your past sessions.</p>
-    <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-        <button class="btn btn-primary me-md-2" routerLink="/new-session">Start New Session</button>
-        <button class="btn btn-secondary" routerLink="/sessions">Review Past Sessions</button>
-    </div>
+  <hr>
+  <p>To get started, please <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#registerModal">register</button> or select one of the users above.</p>
+  <p>Registration is only necessary to distinguish between multiple users. Your data remains private on this local installation.</p>
 }
 
 <!-- Modals -->
-<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+<div class="modal fade" id="languagesModal" tabindex="-1" aria-labelledby="languagesModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="loginModalLabel">Login</h1>
+        <h1 class="modal-title fs-5" id="languagesModalLabel">New Language</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        ...
+        <p>Choose your source (usually english) and your target language.</p>
+        <div class="mb-3">
+          <label for="source_language" class="form-label">Source Language (the one you already understand, or mother tongue)</label>
+          <input type="text" class="form-control" id="source_language" placeholder="SOURCE ISO CODE 2 (for example 'en')" [formControl]="source_language" >
+        </div>
+        <div class="mb-3">
+          <label for="target_language" class="form-label">Target Language (the one you want to learn)</label>
+          <input type="text" class="form-control" id="target_language" placeholder="TARGET ISO CODE 2 (for example 'it" [formControl]="target_language" >
+        </div>
+        <button class="btn btn-primary" (click)="newLanguage()" data-bs-toggle="modal" data-bs-target="#languagesModal">Save</button>
+        <hr>
+        <p>Take a look at the table of available languages and their corresponding codes:</p>
+        <table class="table table-striped table-sm">
+          <thead>
+            <tr>
+              <th scope="col">Language</th>
+              <th scope="col">Code</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let lang of languages">
+              <td>{{lang.name}}</td>
+              <td>{{lang.code}}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 </div>
+
 
 <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
   <div class="modal-dialog">

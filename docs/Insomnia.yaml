@@ -12,7 +12,7 @@ collection:
     meta:
       id: req_fc9102b3ecd0404da877bae10bfa7863
       created: 1769874381489
-      modified: 1769874602743
+      modified: 1770747214801
       isPrivate: false
       description: ""
       sortKey: -1769874381489
@@ -45,7 +45,7 @@ collection:
     meta:
       id: req_ebce52a32c5245de8cf3a65a719d1cc8
       created: 1770479602203
-      modified: 1770480887233
+      modified: 1770747208150
       isPrivate: false
       description: ""
       sortKey: -1758859664013.5
@@ -63,6 +63,52 @@ collection:
     headers:
       - name: Content-Type
         value: application/json
+      - name: User-Agent
+        value: insomnia/12.3.0
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: "{{ _.baseUrl }}/user"
+    name: user_list
+    meta:
+      id: req_3c3a317a87c84d5f8c910c6f8e3c30b7
+      created: 1770746984270
+      modified: 1770747195186
+      isPrivate: false
+      description: ""
+      sortKey: -1753352305275.75
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/12.3.0
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: "{{ _.baseUrl }}/languages"
+    name: languages_list
+    meta:
+      id: req_8a21b7526ffe4589b2e41629d90c3f64
+      created: 1770818587586
+      modified: 1770818597938
+      isPrivate: false
+      description: ""
+      sortKey: -1750598625906.875
+    method: GET
+    headers:
       - name: User-Agent
         value: insomnia/12.3.0
         description: ""

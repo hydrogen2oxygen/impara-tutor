@@ -3,6 +3,8 @@ import {Link} from "../domains/Link";
 import {ActivatedRoute, Router} from "@angular/router";
 import {ImparaService} from "../services/impara.service";
 import {User} from "../domains/User";
+import {Language} from "../domains/Language";
+import {Languages} from "../domains/Languages";
 
 @Component({
   selector: 'app-root',
@@ -12,6 +14,8 @@ import {User} from "../domains/User";
 export class AppComponent implements OnInit {
 
   user: User | null = null // synchronized with ImparaService.user$
+  userLanguage: Language | null = null // synchronized
+  languages: Languages[] = []
 
   constructor(private router: Router,
               private route: ActivatedRoute,
@@ -21,8 +25,23 @@ export class AppComponent implements OnInit {
   links: Link[] = [];
 
   ngOnInit(): void {
-    this.initLinks()
+    this.imparaService.listLanguages().subscribe( languages => { this.languages = languages })
     this.imparaService.user$.subscribe( user => {this.user = user})
+    this.initLinks()
+    let currentUser = localStorage.getItem("currentUser")
+    if (currentUser) {
+      console.log("CURRENT USER EXIST")
+      this.user = JSON.parse(currentUser)
+      let language = localStorage.getItem("currentLanguage")
+      if (language) {
+        console.log("CURRENT LANGUAGE EXIST")
+        const parsedLanguage: Language = JSON.parse(language);
+        this.imparaService.setUserLanguage(parsedLanguage);
+      }
+      this.imparaService.language$.subscribe( language => {
+        this.userLanguage = language
+      })
+    }
   }
 
   navigate(navigationPath: string) {
@@ -80,5 +99,9 @@ export class AppComponent implements OnInit {
 
   logout() {
     this.imparaService.logout()
+  }
+
+  getLanguageName(code: string): string | undefined {
+    return this.languages.find(lang => lang.code === code)?.name;
   }
 }
