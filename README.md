@@ -8,3 +8,6 @@
 The proof of AI concept works. It asked Ollama to return a comma separated list of the most important words from the given text.
 
 ![](docs/images/proofOfConcept.png)
+
+# For Developers
+Take a look at [API.md](API.md).
