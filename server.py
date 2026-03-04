@@ -3,7 +3,7 @@ from pathlib import Path
 
 from openai import OpenAI
 
-from py.domains.ImparaDomainsORM import User, Language, Languages
+from py.domains.ImparaDomainsORM import User, Language, Languages, Course, Lesson, DictEntry, DictSense, DictTranslation, DictExample, UserSenseState
 from py.domains.OpenAIRequest import OpenAIRequest
 from py.services.databaseServiceORM import ImparaDB
 
@@ -220,6 +220,69 @@ class ImparaServer:
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
+        # ==================== COURSE ENDPOINTS ====================
+
+        @self.app.get("/api/courses")
+        def list_courses():
+            try:
+                return self.db.list_courses()
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.get("/api/courses/user/{user_id}")
+        def list_courses_by_user(user_id: int):
+            try:
+                return self.db.list_courses_by_user(user_id)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.get("/api/courses/target-language/{target_language}")
+        def list_courses_by_target_language(target_language: str):
+            try:
+                return self.db.list_courses_by_target_language(target_language)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.get("/api/course/{course_id}")
+        def get_course(course_id: int):
+            try:
+                course = self.db.get_course(course_id)
+                if course is None:
+                    raise HTTPException(status_code=404, detail=f"Course with id {course_id} not found")
+                return course
+            except HTTPException:
+                raise
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.post("/api/course")
+        def create_course(payload: dict = Body(...)):
+            try:
+                course = Course(**payload)
+                return self.db.insert_course(course)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.put("/api/course/{course_id}")
+        def update_course(course_id: int, payload: dict = Body(...)):
+            try:
+                course = self.db.update_course(course_id, **payload)
+                if course is None:
+                    raise HTTPException(status_code=404, detail=f"Course with id {course_id} not found")
+                return course
+            except HTTPException:
+                raise
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.delete("/api/course/{course_id}")
+        def delete_course(course_id: int):
+            try:
+                self.db.delete_course(course_id)
+                return {"message": f"Course with id {course_id} deleted"}
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
         @self.app.get("/api/languages")
         def list_languages():
             try:
@@ -240,6 +303,375 @@ class ImparaServer:
         def list_user_languages(user_id: int):
             try:
                 return self.db.list_user_languages(user_id)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        # ==================== LESSON ENDPOINTS ====================
+
+        @self.app.get("/api/lessons")
+        def list_lessons():
+            try:
+                return self.db.list_lessons()
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.get("/api/lessons/user/{user_id}")
+        def list_lessons_by_user(user_id: int):
+            try:
+                return self.db.list_lessons_by_user(user_id)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.get("/api/lessons/course/{course_id}")
+        def list_lessons_by_course(course_id: int):
+            try:
+                return self.db.list_lessons_by_course(course_id)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.get("/api/lessons/top-level/course/{course_id}")
+        def list_top_level_lessons(course_id: int):
+            try:
+                return self.db.list_top_level_lessons(course_id)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.get("/api/lesson/{lesson_id}")
+        def get_lesson(lesson_id: int):
+            try:
+                lesson = self.db.get_lesson(lesson_id)
+                if lesson is None:
+                    raise HTTPException(status_code=404, detail=f"Lesson with id {lesson_id} not found")
+                return lesson
+            except HTTPException:
+                raise
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.post("/api/lesson")
+        def create_lesson(payload: dict = Body(...)):
+            try:
+                lesson = Lesson(**payload)
+                return self.db.insert_lesson(lesson)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.put("/api/lesson/{lesson_id}")
+        def update_lesson(lesson_id: int, payload: dict = Body(...)):
+            try:
+                lesson = self.db.update_lesson(lesson_id, **payload)
+                if lesson is None:
+                    raise HTTPException(status_code=404, detail=f"Lesson with id {lesson_id} not found")
+                return lesson
+            except HTTPException:
+                raise
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.delete("/api/lesson/{lesson_id}")
+        def delete_lesson(lesson_id: int):
+            try:
+                self.db.delete_lesson(lesson_id)
+                return {"message": f"Lesson with id {lesson_id} deleted"}
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        # ==================== DICT_ENTRY ENDPOINTS ====================
+
+        @self.app.get("/api/dict-entries")
+        def list_dict_entries():
+            try:
+                return self.db.list_dict_entries()
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.get("/api/dict-entries/language/{language}")
+        def list_dict_entries_by_language(language: str):
+            try:
+                return self.db.list_dict_entries_by_language(language)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.get("/api/dict-entry/lemma/{language}/{lemma}")
+        def get_dict_entry_by_lemma(language: str, lemma: str):
+            try:
+                entry = self.db.get_dict_entry_by_lemma(language, lemma)
+                if entry is None:
+                    raise HTTPException(status_code=404, detail=f"DictEntry not found")
+                return entry
+            except HTTPException:
+                raise
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.get("/api/dict-entry/{entry_id}")
+        def get_dict_entry(entry_id: int):
+            try:
+                entry = self.db.get_dict_entry(entry_id)
+                if entry is None:
+                    raise HTTPException(status_code=404, detail=f"DictEntry with id {entry_id} not found")
+                return entry
+            except HTTPException:
+                raise
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.post("/api/dict-entry")
+        def create_dict_entry(payload: dict = Body(...)):
+            try:
+                entry = DictEntry(**payload)
+                return self.db.insert_dict_entry(entry)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.put("/api/dict-entry/{entry_id}")
+        def update_dict_entry(entry_id: int, payload: dict = Body(...)):
+            try:
+                entry = self.db.update_dict_entry(entry_id, **payload)
+                if entry is None:
+                    raise HTTPException(status_code=404, detail=f"DictEntry with id {entry_id} not found")
+                return entry
+            except HTTPException:
+                raise
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.delete("/api/dict-entry/{entry_id}")
+        def delete_dict_entry(entry_id: int):
+            try:
+                self.db.delete_dict_entry(entry_id)
+                return {"message": f"DictEntry with id {entry_id} deleted"}
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        # ==================== DICT_SENSE ENDPOINTS ====================
+
+        @self.app.get("/api/dict-senses")
+        def list_dict_senses():
+            try:
+                return self.db.list_dict_senses()
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.get("/api/dict-senses/entry/{entry_id}")
+        def list_dict_senses_by_entry(entry_id: int):
+            try:
+                return self.db.list_dict_senses_by_entry(entry_id)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.get("/api/dict-sense/{sense_id}")
+        def get_dict_sense(sense_id: int):
+            try:
+                sense = self.db.get_dict_sense(sense_id)
+                if sense is None:
+                    raise HTTPException(status_code=404, detail=f"DictSense with id {sense_id} not found")
+                return sense
+            except HTTPException:
+                raise
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.post("/api/dict-sense")
+        def create_dict_sense(payload: dict = Body(...)):
+            try:
+                sense = DictSense(**payload)
+                return self.db.insert_dict_sense(sense)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.put("/api/dict-sense/{sense_id}")
+        def update_dict_sense(sense_id: int, payload: dict = Body(...)):
+            try:
+                sense = self.db.update_dict_sense(sense_id, **payload)
+                if sense is None:
+                    raise HTTPException(status_code=404, detail=f"DictSense with id {sense_id} not found")
+                return sense
+            except HTTPException:
+                raise
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.delete("/api/dict-sense/{sense_id}")
+        def delete_dict_sense(sense_id: int):
+            try:
+                self.db.delete_dict_sense(sense_id)
+                return {"message": f"DictSense with id {sense_id} deleted"}
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        # ==================== DICT_TRANSLATION ENDPOINTS ====================
+
+        @self.app.get("/api/dict-translations")
+        def list_dict_translations():
+            try:
+                return self.db.list_dict_translations()
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.get("/api/dict-translations/sense/{sense_id}")
+        def list_dict_translations_by_sense(sense_id: int):
+            try:
+                return self.db.list_dict_translations_by_sense(sense_id)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.get("/api/dict-translations/language/{target_language}")
+        def list_dict_translations_by_language(target_language: str):
+            try:
+                return self.db.list_dict_translations_by_language(target_language)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.get("/api/dict-translation/{translation_id}")
+        def get_dict_translation(translation_id: int):
+            try:
+                translation = self.db.get_dict_translation(translation_id)
+                if translation is None:
+                    raise HTTPException(status_code=404, detail=f"DictTranslation with id {translation_id} not found")
+                return translation
+            except HTTPException:
+                raise
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.post("/api/dict-translation")
+        def create_dict_translation(payload: dict = Body(...)):
+            try:
+                translation = DictTranslation(**payload)
+                return self.db.insert_dict_translation(translation)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.put("/api/dict-translation/{translation_id}")
+        def update_dict_translation(translation_id: int, payload: dict = Body(...)):
+            try:
+                translation = self.db.update_dict_translation(translation_id, **payload)
+                if translation is None:
+                    raise HTTPException(status_code=404, detail=f"DictTranslation with id {translation_id} not found")
+                return translation
+            except HTTPException:
+                raise
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.delete("/api/dict-translation/{translation_id}")
+        def delete_dict_translation(translation_id: int):
+            try:
+                self.db.delete_dict_translation(translation_id)
+                return {"message": f"DictTranslation with id {translation_id} deleted"}
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        # ==================== DICT_EXAMPLE ENDPOINTS ====================
+
+        @self.app.get("/api/dict-examples")
+        def list_dict_examples():
+            try:
+                return self.db.list_dict_examples()
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.get("/api/dict-examples/sense/{sense_id}")
+        def list_dict_examples_by_sense(sense_id: int):
+            try:
+                return self.db.list_dict_examples_by_sense(sense_id)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.get("/api/dict-example/{example_id}")
+        def get_dict_example(example_id: int):
+            try:
+                example = self.db.get_dict_example(example_id)
+                if example is None:
+                    raise HTTPException(status_code=404, detail=f"DictExample with id {example_id} not found")
+                return example
+            except HTTPException:
+                raise
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.post("/api/dict-example")
+        def create_dict_example(payload: dict = Body(...)):
+            try:
+                example = DictExample(**payload)
+                return self.db.insert_dict_example(example)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.put("/api/dict-example/{example_id}")
+        def update_dict_example(example_id: int, payload: dict = Body(...)):
+            try:
+                example = self.db.update_dict_example(example_id, **payload)
+                if example is None:
+                    raise HTTPException(status_code=404, detail=f"DictExample with id {example_id} not found")
+                return example
+            except HTTPException:
+                raise
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.delete("/api/dict-example/{example_id}")
+        def delete_dict_example(example_id: int):
+            try:
+                self.db.delete_dict_example(example_id)
+                return {"message": f"DictExample with id {example_id} deleted"}
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        # ==================== USER_SENSE_STATE ENDPOINTS ====================
+
+        @self.app.get("/api/user-sense-states/user/{user_id}")
+        def list_user_sense_states(user_id: int):
+            try:
+                return self.db.list_user_sense_states(user_id)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.get("/api/user-sense-states/sense/{sense_id}")
+        def list_user_sense_states_by_sense(sense_id: int):
+            try:
+                return self.db.list_user_sense_states_by_sense(sense_id)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.get("/api/user-sense-state/{user_id}/{sense_id}")
+        def get_user_sense_state(user_id: int, sense_id: int):
+            try:
+                state = self.db.get_user_sense_state(user_id, sense_id)
+                if state is None:
+                    raise HTTPException(status_code=404, detail=f"UserSenseState not found")
+                return state
+            except HTTPException:
+                raise
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.post("/api/user-sense-state")
+        def create_user_sense_state(payload: dict = Body(...)):
+            try:
+                state = UserSenseState(**payload)
+                return self.db.insert_user_sense_state(state)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.put("/api/user-sense-state/{user_id}/{sense_id}")
+        def update_user_sense_state(user_id: int, sense_id: int, payload: dict = Body(...)):
+            try:
+                state = self.db.update_user_sense_state(user_id, sense_id, **payload)
+                if state is None:
+                    raise HTTPException(status_code=404, detail=f"UserSenseState not found")
+                return state
+            except HTTPException:
+                raise
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.delete("/api/user-sense-state/{user_id}/{sense_id}")
+        def delete_user_sense_state(user_id: int, sense_id: int):
+            try:
+                self.db.delete_user_sense_state(user_id, sense_id)
+                return {"message": f"UserSenseState deleted for user {user_id} and sense {sense_id}"}
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
