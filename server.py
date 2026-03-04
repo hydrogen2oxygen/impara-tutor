@@ -3,19 +3,19 @@ from pathlib import Path
 
 from openai import OpenAI
 
-from py.domains.ImparaDomains import User, UserCreate, LanguageCreate, Language
+from py.domains.ImparaDomainsORM import User, Language, Languages
 from py.domains.OpenAIRequest import OpenAIRequest
-from py.services.databaseService import ImparaDB
+from py.services.databaseServiceORM import ImparaDB
 
 import httpx
-from fastapi import FastAPI, HTTPException
+from fastapi import Body, FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import requests
 
-class AngularUIServer:
+class ImparaServer:
     def __init__(self):
         self.settings = self.load_settings()
         self.dist_folder = Path(__file__).parent / "ui" / "dist" / "ui"
@@ -187,25 +187,21 @@ class AngularUIServer:
                 raise HTTPException(status_code=500, detail=str(e))
 
         @self.app.post("/api/user")
-        def create_user(user: UserCreate):
+        def create_user(payload: dict = Body(...)):
             try:
+                user = User(**payload)
                 self.db.insert_user(user)
-                return self.db.get_user_by_name(user.display_name)
+                return self.db.get_user_by_name(user)
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
         @self.app.put("/api/user")
-        def update_user(user: User):
+        def update_user(payload: dict = Body(...)):
             try:
+                user = User(**payload)
                 self.db.delete_user(user.id)
-                updated_user = UserCreate(
-                    display_name=user.display_name,
-                    email=user.email,
-                    bio=user.bio,
-                    avatar_path=user.avatar_path
-                )
-                self.db.insert_user(updated_user)
-                return self.db.get_user_by_name(user.display_name)
+                self.db.insert_user(user)
+                return self.db.get_user_by_name(user)
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
@@ -232,8 +228,9 @@ class AngularUIServer:
                 raise HTTPException(status_code=500, detail=str(e))
 
         @self.app.post("/api/language")
-        def create_user_language(language: LanguageCreate):
+        def create_user_language(payload: dict = Body(...)):
             try:
+                language = Language(**payload)
                 self.db.insert_language(language)
                 return self.db.list_user_languages(language.user_id)
             except Exception as e:
@@ -273,7 +270,7 @@ class TokensRequest(BaseModel):
 
 if __name__ == "__main__":
     import uvicorn
-    server = AngularUIServer()
+    server = ImparaServer()
     port = server.settings.get("port", 7000)
     print(f"Starting server on port {port}")
     print(f"Serving Angular app from: {server.dist_folder}")
